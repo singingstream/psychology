@@ -2,202 +2,218 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>心理学検定対策マスタークイズ（A領域全5章対応）</title>
+    <title>心理学検定 究極マスター</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif; background: #f4f7f9; display: flex; justify-content: center; padding: 20px; color: #2c3e50; }
-        #app { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.12); width: 100%; max-width: 650px; }
-        h1 { font-size: 1.4rem; text-align: center; color: #2980b9; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-bottom: 25px; }
+        body { font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif; background: #eef2f5; display: flex; justify-content: center; padding: 20px; color: #2c3e50; }
+        #app { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
+        h1 { font-size: 1.5rem; text-align: center; color: #34495e; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-bottom: 25px; }
         .btn { display: block; width: 100%; padding: 16px; margin: 12px 0; border: none; border-radius: 12px; cursor: pointer; font-size: 1.05rem; transition: 0.2s; font-weight: bold; }
-        .category-btn { background: #3498db; color: white; text-align: left; padding-left: 25px; box-shadow: 0 4px #2980b9; }
+        .category-btn { background: #3498db; color: white; box-shadow: 0 4px #2980b9; text-align: left; padding-left: 20px; }
         .category-btn:hover { background: #2980b9; transform: translateY(-2px); }
-        .choice-btn { background: #fff; border: 2px solid #dfe6e9; text-align: left; padding-left: 20px; }
+        .choice-btn { background: #fff; border: 2px solid #dfe6e9; text-align: left; padding-left: 20px; line-height: 1.4; font-weight: normal; }
         .choice-btn:hover { background: #f0f7ff; border-color: #3498db; }
-        .correct { background: #2ecc71 !important; color: white; border-color: #27ae60 !important; }
-        .wrong { background: #e74c3c !important; color: white; border-color: #c0392b !important; }
+        .correct { background: #2ecc71 !important; color: white; border-color: #27ae60 !important; font-weight: bold; }
+        .wrong { background: #e74c3c !important; color: white; border-color: #c0392b !important; font-weight: bold; }
         .hidden { display: none; }
+        
+        #upload-box { border: 2px dashed #bdc3c7; padding: 40px 20px; text-align: center; border-radius: 15px; background: #f8f9fa; margin-bottom: 20px; transition: 0.3s; }
+        #upload-box:hover { border-color: #3498db; background: #f0f7ff; }
+        #upload-box input { display: none; }
+        #upload-label { background: #2ecc71; color: white; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-block; transition: 0.2s; }
+        #upload-label:hover { background: #27ae60; }
+        
         #stats { text-align: right; color: #7f8c8d; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; }
         #feedback-area { margin-top: 25px; padding: 18px; border-radius: 10px; display: none; }
         .feedback-title { font-weight: bold; font-size: 1.25rem; margin-bottom: 10px; text-align: center; }
-        .explanation-text { font-size: 0.95rem; line-height: 1.6; color: #34495e; background: #f9f9f9; padding: 12px; border-left: 5px solid #3498db; border-radius: 4px; }
-        .menu-desc { text-align: center; font-weight: bold; margin-bottom: 20px; color: #555; }
+        .explanation-text { font-size: 0.95rem; line-height: 1.6; color: #34495e; background: #f9f9f9; padding: 15px; border-left: 5px solid #3498db; border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <h1>心理学検定2級対策：マスター問題集</h1>
+    <h1>心理学検定 究極マスター</h1>
     
-    <div id="menu">
-        <p class="menu-desc">学習する章（項目）を選択してください（各最大20問出題）</p>
-        <button class="btn category-btn" onclick="startQuiz('ch1')">第1章：原理・研究法・歴史</button>
-        <button class="btn category-btn" onclick="startQuiz('ch2')">第2章：学習・認知・知覚</button>
-        <button class="btn category-btn" onclick="startQuiz('ch3')">第3章：発達・教育</button>
-        <button class="btn category-btn" onclick="startQuiz('ch4')">第4章：社会・感情・性格</button>
-        <button class="btn category-btn" onclick="startQuiz('ch5')">第5章：臨床・障害</button>
+    <div id="upload-screen">
+        <p style="text-align:center; font-weight:bold; margin-bottom:10px;">作成したExcelファイル（.xlsx）を1つ選択してください</p>
+        <p style="text-align:center; font-size:0.85rem; color:#e74c3c; margin-bottom:20px;">※シート分けされた5つの章を自動で読み込みます</p>
+        <div id="upload-box">
+            <label id="upload-label" for="excel-file">📁 Excelファイルを選択</label>
+            <input type="file" id="excel-file" accept=".xlsx, .xls">
+            <p id="file-name" style="margin-top: 15px; color: #7f8c8d; font-size: 0.9rem;">ファイルが選択されていません</p>
+        </div>
     </div>
 
-    <div id="quiz-container" class="hidden">
-        <div id="stats"></div>
-        <div id="question" style="font-size: 1.15rem; margin: 20px 0; font-weight: bold; line-height: 1.6;"></div>
+    <div id="menu-screen" class="hidden">
+        <p style="text-align:center; font-weight:bold; color:#555; margin-bottom:20px;">学習する章を選択してください（ランダム20問）</p>
+        <div id="chapter-buttons"></div>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <div id="stats">問題 <span id="q-num">1</span> / <span id="q-total">20</span></div>
+        <div id="question" style="font-size: 1.15rem; margin: 20px 0; font-weight: bold; line-height: 1.6; min-height: 3em;"></div>
         <div id="choices"></div>
         
         <div id="feedback-area">
             <div id="feedback-result" class="feedback-title"></div>
             <div id="explanation" class="explanation-text"></div>
-            <button id="next-btn" class="btn" style="background:#3498db; color:white; margin-top:20px;" onclick="nextQuestion()">次の問題へ</button>
+            <button id="next-btn" class="btn" style="background:#3498db; color:white; margin-top:20px;" onclick="nextQuestion()">次の問題へ ➔</button>
         </div>
     </div>
 
     <div id="result-screen" class="hidden" style="text-align: center;">
-        <h2>終了！お疲れ様でした</h2>
+        <h2>テスト終了！</h2>
         <p style="font-size: 1.2rem; margin-top:20px;">あなたのスコア</p>
         <p style="font-size: 4rem; color: #e67e22; font-weight: bold; margin: 10px 0;"><span id="score">0</span> / <span id="total-score">20</span></p>
-        <p id="comment" style="font-weight:bold; font-size:1.2rem; color:#2c3e50; margin-bottom:30px;"></p>
-        <button class="btn" style="background:#2ecc71; color:white;" onclick="location.reload()">ホームメニューに戻る</button>
+        <p id="comment" style="font-weight:bold; font-size:1.2rem; margin-bottom:30px;"></p>
+        <button class="btn" style="background:#2ecc71; color:white;" onclick="backToMenu()">メニューに戻る</button>
     </div>
 </div>
 
 <script>
-// 送っていただいたExcelデータベースの重要問題を全網羅
-const quizData = {
-    ch1: [
-        { q: "形式科学（数学など）と対比され、現実世界にある事象を扱い理論や法則を導き出す、心理学が属する学問分類は何か。", a: "経験科学", c: ["形式科学", "人文科学", "直観科学"], exp: "心理学は現実のデータや実験、観察に基づいて法則を導き出す「経験科学」に分類されます。" },
-        { q: "日本十進分類法（NDC）において、心理学（140番）が属する大分類（類）はどれか。", a: "哲学", c: ["歴史", "社会科学", "自然科学"], exp: "日本の図書館分類では、心理学は伝統的に「1類：哲学」の配下に置かれています。" },
-        { q: "「心理学の過去は長いが歴史は短い」という有名な言葉を残し、無意味綴りを用いた記憶研究でも知られるドイツの心理学者は誰か。", a: "エビングハウス", c: ["ヴント", "ワトソン", "ティチェナー"], exp: "1908年の『心理学要論』の冒頭にあるエビングハウスの言葉です。" },
-        { q: "法則定立的な自然科学としての心理学が目指すものが「説明」であるのに対し、個性記述的な精神科学が目指すものは何か。", a: "理解", c: ["予測", "統制", "記銘"], exp: "個別の事例や個性を深く掘り下げる精神科学的アプローチでは、対象の「理解」が目的となります。" },
-        { q: "1879年、ドイツのライプツィヒ大学に世界初の心理学実験室を創設し、「実験心理学の父」と呼ばれるのは誰か。", a: "ヴント", c: ["ジェームズ", "フェヒナー", "ウェーバー"], exp: "ヴントが実験室を創設した1879年が、近現代の科学的心理学の成立の年とされています。" },
-        { q: "ヴントが用いた、訓練された実験参加者に自身の内面的な意識状態を観察・報告させる手法を何というか。", a: "内省法", c: ["自由連想法", "客観的観察法", "投影法"], exp: "自分の心を自分で観察する手法で、「内省（ないせい）法」または内観法と呼ばれます。" },
-        { q: "ヴントの心理学（要素主義）をアメリカに導入し、意識の構成要素を研究する「構成主義」を確立したのは誰か。", a: "ティチェナー", c: ["ジェームズ", "ワトソン", "キャッテル"], exp: "ティチェナーはヴントの弟子であり、アメリカで構成主義を厳格に推進しました。" },
-        { q: "ティチェナーらの構成主義に対抗し、意識の要素ではなく、環境に適応するための「働き（機能）」を重視したジェームズらの立場を何というか。", a: "機能主義", c: ["行動主義", "ゲシュタルト心理学", "精神分析"], exp: "ウィリアム・ジェームズらが主導した、心の適応的な有用性を重視する立場です。" },
-        { q: "意識中心の心理学を批判し、客観的に観察可能な「行動」のみを研究対象とすべきだと主張した、ワトソンが創始した立場は何か。", a: "行動主義", c: ["構成主義", "機能主義", "認知主義"], exp: "ジョン・ワトソンが1913年に提唱した「行動主義」は、のちの心理学に多大な影響を与えました。" },
-        { q: "環境刺激（S）とそれに対する生体の反応（R）の結びつきのみを重視する、初期のワトソンらの行動主義モデルを何というか。", a: "S-R理論", c: ["S-O-R理論", "オペラント理論", "場理論"], exp: "刺激（Stimulus）と反応（Response）の直接的な連合を重視したため「S-R理論」と呼ばれます。" },
-        { q: "ワトソンらのS-Rモデルの間に、生体（Organism）の内面的な認知や動機づけ（O）を挟み込んだトールマンやハルらの立場を何というか。", a: "新行動主義", c: ["新構成主義", "精神分析学", "ゲシュタルト学派"], exp: "生体内部の変数を認めたため、S-O-R理論、または「新行動主義」と呼ばれます。" },
-        { q: "ネズミの迷路学習実験から、報酬がなくても頭の中に地図が形成される「潜在学習」や「認知地図」を提唱した心理学者は誰か。", a: "トールマン", c: ["スキナー", "パヴロフ", "ワトソン"], exp: "トールマンは、生体が単なる機械的反応ではなく、内部に地図（認知地図）を持つことを示しました。" },
-        { q: "徹底的行動主義を掲げ、スキナー箱を用いた実験からオペラント条件づけの理論を体系化したアメリカの心理学者は誰か。", a: "スキナー", c: ["ハル", "ソーンダイク", "パヴロフ"], exp: "B.F.スキナーは、自発的な行動が環境からの強化によって学習される仕組みを明らかにしました。" },
-        { q: "ウェルトハイマー、コフカ、ケーラーらが創始した、心の本質は要素の足し算ではなく、全体のまとまり（形態）にあるとする心理学派は何か。", a: "ゲシュタルト心理学", c: ["行動主義", "精神分析", "構成主義"], exp: "「全体は部分の総和以上のもの（ゲシュタルト）」とするドイツ発祥の心理学派です。" },
-        { q: "静止した2つの光点を交互に素早く点滅させると、光が移動して見えるような、ゲシュタルト心理学の出発点となった現象を何というか。", a: "仮現運動", c: ["誘導運動", "自動運動", "残像現象"], exp: "ウェルトハイマーが研究した運動視の錯覚で、映画などの原理でもある「仮現運動（およその運動）」です。" },
-        { q: "チンパンジーの迷路やバナナ箱を使った実験から、試行錯誤ではなく、状況をパッと見通すことで問題解決が起こる「洞察学習」を提唱したのは誰か。", a: "ケーラー", c: ["コフカ", "ウェルトハイマー", "ソーンダイク"], exp: "ケーラーはカナリア諸島での実験を通じ、閃きによる解決を「洞察（インサイト）」と呼びました。" },
-        { q: "人の行動は個人の特性（P）と環境（E）の相互作用（関数）によって決まるとする「場理論」を提唱したゲシュタルト心理学者は誰か。", a: "レヴィン", c: ["コフカ", "ケーラー", "トールマン"], exp: "クルト・レヴィンは B = f(P, E) という有名な数式で心理学的な場を表現しました。" },
-        { q: "チョムスキーの言語獲得理論やナイサーの著書により定着した、人間の心を「情報処理システム」として捉える近代心理学のアプローチは何か。", a: "認知心理学", c: ["深層心理学", "新行動主義", "構成心理学"], exp: "1950〜60年代の「認知革命」を経て、現在の心理学の主流となった「認知心理学」です。" },
-        { q: "実験において、研究者が意図的に操作・変更する条件（原因となる変数）のことを何というか。", a: "独立変数", c: ["従属変数", "剰余変数", "媒介変数"], exp: "研究者が自由に決める原因変数を「独立変数」、その結果として測定される変数を「従属変数」と呼びます。" },
-        { q: "実験の結果として測定される、独立変数の影響を受けて変化する変数（結果となる変数）のことを何というか。", a: "従属変数", c: ["独立変数", "統制変数", "環境変数"], exp: "独立変数に「従属」して決まる測定データであるため「従属変数」と呼ばれます。" }
-    ],
-    ch2: [
-        { q: "イヌにメトロノームの音を聞かせた後に餌を与えることを繰り返し、音だけで唾液を分泌させた、パヴロフが発見した学習原理は何か。", a: "古典的条件づけ", c: ["オペラント条件づけ", "試行錯誤学習", "洞察学習"], exp: "レスポンデント条件づけとも呼ばれ、生得的な反射と中性刺激を結びつける学習です。" },
-        { q: "古典的条件づけにおいて、条件づけをしなくても生得的に引き起こされる、餌に対する唾液分泌のような反応を何というか。", a: "無条件反応", c: ["条件反応", "オペラント反応", "自発的反応"], exp: "生まれつき備わっている反応を「無条件反応（UR）」、その原因となる餌などを「無条件刺激（US）」と呼びます。" },
-        { q: "古典的条件づけが成立した後、報酬（無条件刺激）を与えずに条件刺激だけを提示し続けると、条件反応が次第に消失していく現象を何というか。", a: "消去", c: ["自発的回復", "般化", "弁別"], exp: "条件刺激（音）のあとに無条件刺激（餌）が来ない状態が続くと、反応が失われる「消去」が起こります。" },
-        { q: "消去によって一度消えた条件反応が、一定の休憩時間を置いた後に、条件刺激を提示するだけで一時的に復活する現象を何というか。", a: "自発的回復", c: ["般化", "再条件づけ", "脱抑制"], exp: "記憶が完全に消えたわけではないことを示す現象で、「自発的回復」と呼ばれます。" },
-        { q: "特定の条件刺激（ベルの音）だけでなく、それに類似した別の刺激（ブザーの音）に対しても条件反応が生じるようになる現象を何というか。", a: "般化", c: ["弁別", "消去", "遮断"], exp: "刺激の共通性に応じて反応が広がる現象を「般化（はんか）」と呼びます。" },
-        { q: "特定の条件刺激には報酬を与え、類似した別の刺激には報酬を与えないことで、2つの刺激を区別して反応させる手続きを何というか。", a: "弁別", c: ["般化", "シェイピング", "消去"], exp: "違いを見分けて異なる反応をすることを「弁別（べんべつ）」と言います。" },
-        { q: "ソーンダイクが提唱した、猫のパズルボックス実験に基づく「満足をもたらす行動は反復され、不快をもたらす行動は減少する」という法則は何か。", a: "効果の法則", c: ["練習の法則", "準備性の法則", "強化の法則"], exp: "のちのスキナーのオペラント条件づけの基礎となった、ソーンダイクの「効果の法則」です。" },
-        { q: "レバーを押すと餌が出る箱（スキナー箱）に入れられたネズミが、自発的にレバーを押す頻度を増やすような学習を何というか。", a: "オペラント条件づけ", c: ["古典的条件づけ", "潜在学習", "模倣学習"], exp: "道具的条件づけとも呼ばれ、生体の自発的な行動（オペラント）とその結果によって成立する学習です。" },
-        { q: "オペラント条件づけにおいて、行動のあとに好ましい刺激（報酬）が出現することで、その行動の発生頻度が高まることを何というか。", a: "正の強化", c: ["負の強化", "正の罰", "負の罰"], exp: "刺激の「出現（正）」によって、行動が「増える（強化）」ため「正の強化」と言います。" },
-        { q: "行動のあとに嫌悪刺激（不快な音など）が消失・除去されることで、その行動の発生頻度が高まることを何というか。", a: "負の強化", c: ["正の強化", "正の罰", "負の罰"], exp: "刺激の「除去（負）」によって、行動が「増える（強化）」ため「負の強化」と言います。お風呂に入って不快な汚れが落ちるからお風呂好きになる、といった例です。" },
-        { q: "記憶の3つのプロセスとは、情報を覚える「記銘」、とどめておく「保持（貯蔵）」と、もう一つは何か。", a: "想起", c: ["リハーサル", "精緻化", "符号化"], exp: "記憶は、記銘（符号化）➔ 保持（貯蔵） ➔ 想起（検索）の3段階から成り立ちます。" },
-        { q: "心理学者のミラーが提唱した、人間が短期記憶で一度に保持できる情報の限界容量（7±2）の単位を何というか。", a: "chunk（チャンク）", c: ["bit（ビット）", "word（ワード）", "item（アイテム）"], exp: "情報を意味のあるまとまりにした最小単位を「チャンク」と呼びます。" },
-        { q: "短期記憶の情報を忘れないように、頭の中で何度も復唱・復唱する行為を何というか。", a: "リハーサル", c: ["チャンキング", "符号化", "プライミング"], exp: "単に繰り返す「維持リハーサル」と、意味を結びつける「精緻化リハーサル」があります。" },
-        { q: "アトキンソンらが提唱した、記憶を「感覚記憶」「短期記憶」「長期記憶」の3つの貯蔵庫の連続として捉えるモデルを何というか。", a: "二重貯蔵モデル", c: ["作動記憶モデル", "処理レベルモデル", "網羅モデル"], exp: "時間の長さに応じた複数の貯蔵庫を仮定する、もっとも古典的で強固な「二重貯蔵モデル」です。" },
-        { q: "自分の過去の思い出や体験に関する、言葉で表現できる長期記憶の分類を何というか。", a: "エピソード記憶", c: ["意味記憶", "手続き的記憶", "プライミング"], exp: "「いつ、どこで、誰が」といったコンテキストを含む個人の思い出は「エピソード記憶」に分類されます。" },
-        { q: "「日本の首都は東京である」といった、個人の体験とは切り離された知識や事実に関する長期記憶を何というか。", a: "意味記憶", c: ["エピソード記憶", "手続き的記憶", "潜在記憶"], exp: "言葉の定義や一般的な知識は「意味記憶」と呼ばれ、エピソード記憶とともに「宣言的記憶」に属します。" },
-        { q: "自転車の乗り方や楽器の演奏など、体で覚えた、言葉で説明しにくい長期記憶の分類を何というか。", a: "手続き的記憶", c: ["意味記憶", "エピソード記憶", "宣言的記憶"], exp: "繰り返しによって獲得され、意識せずに実行できる記憶を「手続き的記憶（非宣言的記憶）」と言います。" },
-        { q: "文字リストを記憶して思い出す際、最初の方の単語の正答率が高くなる現象（長期記憶への転送を反映）を何というか。", a: "初頭効果", c: ["新近性効果", "ハロー効果", "カクテル効果"], exp: "リストの最初（初頭）が有利になる現象を「初頭効果」と呼びます。" },
-        { q: "文字リストを思い出す際、最後の方（直前）に提示された単語の正答率が高くなる現象（短期記憶の残存を反映）を何というか。", a: "新近性効果", c: ["初頭効果", "バーナム効果", "残像効果"], exp: "リストの最後（直近）の成績が良い現象を「新近性（しんきんせい）効果」と言います。" },
-        { q: "周囲が騒がしい場所でも、自分の名前や興味のある話題は自然と聞き取れる知覚の選択的注意現象を何というか。", a: "カクテルパーティー効果", c: ["マガーク効果", "傍観者効果", "ピグマリオン効果"], exp: "脳が必要な情報に選択的に注意を向けるため、特定の音だけを際立たせて聴取できる現象です。" }
-    ],
-    ch3: [
-        { q: "ヒトの赤ちゃんは、運動機能は未熟だが感覚器官は開いた状態で生まれる特徴を、ポルトマンは何と呼んだか。", a: "二次的就巣性", c: ["離巣性", "生理的早産", "レディネス"], exp: "鳥類の「留巣性（就巣性）」と「離巣性」のハイブリッドのような、ヒト特有の未熟性を「二次的就巣性」と呼びます。" },
-        { q: "ヒトの赤ちゃんは難産を防ぐため、本来の生物学的な成熟水準より約1年早く生まれてくるという概念を何というか。", a: "生理的早産", c: ["二次的就巣性", "モラトリアム", "刻印づけ"], exp: "ポルトマンが提唱。この「生理的早産」のおかげで、ヒトは生後の豊かな環境刺激から膨大な学習を行うことができます。" },
-        { q: "アヒルの雛などが、孵化直後に最初に動いた対象を追いかけ、生涯にわたり執着する学習現象を何というか。", a: "刷り込み（インプリンティング）", c: ["条件づけ", "モデリング", "社会的参照"], exp: "ローレンツの研究で有名な現象で、カタカナで「インプリンティング」、日本語で「刷り込み（刻印づけ）」と言います。" },
-        { q: "刷り込みのように、特定の学習が成立するために決定的に限られた、人生初期の特定の時期のことを何というか。", a: "臨界期（敏感期）", c: ["モラトリアム期", "準備期", "ギャング・エイジ"], exp: "時期を過ぎると獲得が非常に困難になる限界を「臨界期」と呼び、ヒトでは緩やかに「敏感期」と表現されることも多いです。" },
-        { q: "人間の知能のうち、新しい環境や想定外の局面に臨機応変に対応する能力（20代前半をピークに加齢で低下しやすい）を何というか。", a: "流動性知能", c: ["結晶性知能", "多重知能", "言語性知能"], exp: "キャッテルが提唱。脳の生物学的な処理能力に近いものが「流動性知能」です。" },
-        { q: "人間の知能のうち、長年の学習や経験の蓄積によって結晶化し、高齢になっても上昇・安定しやすい知能を何というか。", a: "結晶性知能", c: ["流動性知能", "一般因子知能", "動作性知能"], exp: "お年寄りの知恵や語彙力、専門知識などが該当する「結晶性知能」です。" },
-        { q: "ピアジェの発達理論で、コップの形状を変えても水の「総量」自体は変化しない、という論理を理解できる概念を何というか。", a: "保存の概念", c: ["対象の永続性", "脱中心化", "アニミズム"], exp: "7〜12歳頃の「具体的操作期」に獲得される重要な論理思考の基礎です。" },
-        { q: "幼児期に見られる、自分自身の視点と他者の視点を区別できず、世界は自分が見える通りに見えていると思い込む傾向を何というか。", a: "自己中心性", c: ["脱中心化", "アニミズム", "心の理論"], exp: "ピアジェが「三つの山課題」で証明した、前操作期特有の認知の限界です。" },
-        { q: "幼児期に見られる、ぬいぐるみや雲など「すべての無生物にも命や意識が宿っている」と信じ込むアプローチを何というか。", a: "アニミズム", c: ["自己中心性", "保存の概念", "永続性"], exp: "前操作期の幼児が「お人形が泣いている」などと考える、擬人化に似た心理傾向です。" },
-        { q: "生後まもない乳児が、周囲のあやしかたに関係なく、生理的な反射として勝手にニコッと微笑む現象を何というか。", a: "自発的微笑", c: ["社会的微笑", "共鳴微笑", "外発的微笑"], exp: "生得的な反射プログラムであり、養育者の保護意欲をかき立てる「自発的微笑（生理的微笑）」です。" },
-        { q: "生後2〜3ヶ月頃の乳児が、大人の顔や語りかけに反応して、社会的なコミュニケーションとして微笑む現象を何というか。", a: "社会的微笑", c: ["自発的微笑", "生理的微笑", "模倣微笑"], exp: "相手を識別し、やり取りとして笑顔を返すようになる重要な一歩です。" },
-        { q: "ボウルビイが提唱した、乳幼児と特定の養育者との間に結ばれる、安心感の基盤となる情緒的な絆を何というか。", a: "アタッチメント（愛着）", c: ["アイデンティティ", "インプリンティング", "レディネス"], exp: "心理的な安全基地として機能し、その後の対人関係の土台となる「アタッチメント（愛着）」です。" },
-        { q: "針金の代理母と布製の代理母に対し、子小猿が布製に執着することを示したハーロウの実験は何か。", a: "アカゲザルの代理母実験", c: ["ボボ人形実験", "スキナー箱実験", "視覚的断崖実験"], exp: "愛着の本質が「栄養摂取（ミルク）」ではなく「接触の心地よさ（スキンシップ）」にあることを証明しました。" },
-        { q: "エインズワースが考案した、母子分離と再会を通じて幼児の愛着スタイルを分類する実験手続きは何か。", a: "ストレンジ・シチュエーション法", c: ["サリーとアンの課題", "三つの山課題", "鏡映描写テスト"], exp: "これによって幼児の愛着は、安定型、回避型、両価（抵抗）型などに分類されます。" },
-        { q: "他者の立場に立って、「あの人は自分とは異なる独自の信念を持っている」ということを推測・察する認知能力を何というか。", a: "心の理論", c: ["自己中心性", "共感性", "脱中心化"], exp: "4歳頃に獲得され、自閉症スペクトラム障害の児童では獲得が遅れがちであるとされています。" },
-        { q: "「心の理論」が子どもに備わっているかどうかを測定するために用いられる、人形を使った有名な誤信念課題は何か。", a: "サリーとアンの課題", c: ["三つの山課題", "視覚的断崖", "パズルボックス"], exp: "カゴと箱の中にビー玉を隠す、心の理論（4歳児の壁）を確かめる有名なテストです。" },
-        { q: "エリクソンが提唱した生涯発達理論において、青年期の心理社会的危機の課題とされるのは何か。", a: "アイデンティティ（自我同一性）の確立", c: ["勤勉性の獲得", "親密性の獲得", "生殖性の獲得"], exp: "「自分は何者なのか」という問いに対する確信（同一性）を得ることが、この時期の最大のテーマです。" },
-        { q: "エリクソンの青年期の課題において、自我の確立が失敗し、自分がどう生きればいいか分からず混乱した状態を何というか。", a: "同一性拡散", c: ["モラトリアム", "劣等感の固執", "停滞性"], exp: "アイデンティティ・クライシスとも呼ばれ、社会的役割への適応に苦しむ状態です。" },
-        { q: "青年期において、社会的な責任が一時的に猶予され、アイデンティティを確立するために自分を模索できる期間を何というか。", a: "モラトリアム", c: ["ギャング・エイジ", "アパシー", "レディネス"], exp: "エリクソンが提唱した、大人の仲間入りをするための「社会的執行猶予期間」です。" },
-        { q: "小学校高学年の男児などに見られる、大人を排除して同世代の仲間同士で強い排他的な集団を作る時期を何というか。", a: "ギャング・エイジ", c: ["チャム・グループ", "ピア・グループ", "モラトリアム"], exp: "集団行動のルールや自立心を学ぶ、発達において非常に自然で重要なステップです。" }
-    ],
-    ch4: [
-        { q: "19世紀末に自己を「主我（I）」と「客我（Me）」に分類し、自己研究の基礎を作った心理学者は誰か。", a: "ジェームズ", c: ["クーリー", "ミード", "オールポート"], exp: "ウィリアム・ジェームズによる。客我（Me）をさらに物質的・精神的・社会的自己に分類しました。" },
-        { q: "「自己は他者や周囲の状況とは完全に切り離された独立固有の存在である」と捉える、欧米圏に多く見られる自己観を何というか。", a: "相互独立的な自己観", c: ["相互協調的な自己観", "社会的自己観", "関係主義的自己観"], exp: "マルクスとキタヤマが提唱。日本などアジア圏に強いのは「相互協調的な自己観」です。" },
-        { q: "人間には自分の意見や能力を正しく評価したい欲求があるため、他者と自分を比較するという理論は何か。", a: "社会的比較理論", c: ["社会的帰属理論", "自己知覚理論", "バランス理論"], exp: "自分より優れた人と比べる「上方比較」、自分より不遇な人と比べる「下方比較」があります。" },
-        { q: "他者の行動の原因を説明する際、その人の内的特性（性格）を過大評価し、状況要因を過小評価してしまう偏りを何というか。", a: "基本的帰属の誤り", c: ["自己奉仕バイアス", "確証バイアス", "正常性バイアス"], exp: "「あいつが失敗したのはドジだからだ（本当は床が滑りやすかっただけなのに）」といった認知バイアスです。" },
-        { q: "自分の成功は自分の実力にし、自分の失敗は運や状況の悪さのせいにする、自己肯定感を守るためのバイアスは何か。", a: "自己奉仕バイアス", c: ["基本的帰属の誤り", "確証バイアス", "ハロー効果"], exp: "セルフ・サービング・バイアスとも呼ばれ、自尊心を維持するための誰もが持つ防衛機制です。" },
-        { q: "他者の顕著で望ましい特徴を一つ知ると、その人の他の側面まで過大に肯定評価してしまう現象を何というか。", a: "ハロー効果（後光効果）", c: ["ピグマリオン効果", "バーナム効果", "初頭効果"], exp: "一つの目立つ特徴に評価全体が引きずられてしまう現象です。" },
-        { q: "誰にでも当てはまる曖昧で一般的な性格記述を、自分だけに完璧に当てはまる特別な診断だと信じ込んでしまう現象を何というか。", a: "バーナム効果", c: ["ハロー効果", "プラセボ効果", "ピグマリオン効果"], exp: "占いや血液型診断などで強く作用する心理現象で、フォアの実験でも知られます。" },
-        { q: "自分の先入観や信念に合致する事実ばかりに目を向け、それに反する不利な証拠を無視してしまう傾向を何というか。", a: "確証バイアス", c: ["正常性バイアス", "現状維持バイアス", "自己奉仕バイアス"], exp: "「やっぱり私の思った通りだ」と思い込みを強化し、偏見を生み出す原因となります。" },
-        { q: "集団の多数派が特定の意見を主張している際、自分の本心とは異なっていても、周囲の意見に合わせてしまう現象を何というか。", a: "同調", c: ["服従", "社会的促進", "社会的怠惰"], exp: "アッシュの「線の長さの実験」で有名であり、サクラの誤った回答に多くの被検者が流されました。" },
-        { q: "白衣を着た実験者のような、権威のある人物の命令に従うことで、道徳的に残酷な行動であっても実行してしまう心理現象を何というか。", a: "服従", c: ["同調", "社会的促進", "内集団ひいき"], exp: "ミルグラムの「アイヒマン実験（電気ショック実験）」によって驚くべき実態が暴かれました。" },
-        { q: "簡単な作業を行う際、他者が周囲で見つめているだけで、一人で行うときよりも作業能率が上昇する現象を何というか。", a: "社会的促進", c: ["社会的抑制", "社会的手抜き", "傍観者効果"], exp: "トリプレットの自転車実験が有名です。逆に、難しい作業では能率が下がる「社会的抑制」が起こります。" },
-        { q: "集団で綱引きをしたり共同作業をしたりする際、人数が増えるほど、一人当たりの出す全力が低下してしまう現象を何というか。", a: "社会的手抜き（リンゲルマン効果）", c: ["傍観者効果", "社会的促進", "集団極性化"], exp: "「リンゲルマン効果」または「社会的怠惰」とも呼ばれ、責任の分散によって生じます。" },
-        { q: "緊急事態が発生した際、その場に居合わせる周囲の目撃者が多いほど、援助行動を起こさなくなる現象を何というか。", a: "傍観者効果", c: ["社会的手抜き", "集団極性化", "正常性バイアス"], exp: "ラタネとダーリーが提唱。「誰かがやるだろう（責任の分散）」や周囲をうかがうことで発生します。" },
-        { q: "リーダーシップを「目標達成機能（P）」と「集団維持機能（M）」の2本の軸で捉える理論を何というか。", a: "PM理論", c: ["2因子理論", "特性理論", "状況適応理論"], exp: "三隅二不二が提唱。双方の機能がともに高い「PM型」のリーダーが、集団の生産性を最も高めるとされます。" },
-        { q: "個人のパーソナリティ（性格）を、いくつかの定まった「型」のいずれかに分類して捉えようとする考え方を何というか。", a: "類型論", c: ["特性論", "因子論", "五因子論"], exp: "ユングの「内向・外向」やクレッチマーの「体型分類」のように、全体をざっくり分類するのが「類型論」です。" },
-        { q: "性格を型で分けるのではなく、「誠実性」「社交性」といった細かな要素（特性）の強弱として捉える考え方を何というか。", a: "特性論", c: ["類型論", "構造論", "相貌論"], exp: "オールポートやキャッテルが推進した、個人の性格を数量的に測定しやすいアプローチです。" },
-        { q: "現代の特性論の主流であり、人間のパーソナリティを5つの独立した次元（OCEAN）の組み合わせで説明する理論は何か。", a: "ビッグ・ファイブ理論", c: ["16因子モデル", "3心構造論", "MBTI理論"], exp: "ゴールドバーグらが提唱。開放性・誠実性・外向性・協調性・神経症傾向の5つで性格を網羅します。" },
-        { q: "「この世界は因果応報であり、善良な人には良いことが起き、悪人には罰が下る」という、認知の歪みを伴う信念を何というか。", a: "公正世界仮説", c: ["基本的帰属の誤り", "自己奉仕バイアス", "バーナム効果"], exp: "これが行き過ぎると、「災害の被害に遭ったのはその人に落ち度があったからだ」という被害者非難を生みます。" },
-        { q: "1つの質問に対して「はい」「いいえ」などの選択肢で回答させる性格検査方法の総称は何か。", a: "質問紙法", c: ["投影法", "作業検査法", "面接法"], exp: "MMPIやYG性格検査が該当。客観的で集計しやすい一方、意図的な嘘（社会的望ましさバイアス）に弱い欠点があります。" },
-        { q: "インクのしみ（ロールシャッハ）など、曖昧な刺激に対する反応から、無意識のパーソナリティを分析する検査方法の総称は何か。", a: "投影法", c: ["質問紙法", "作業検査法", "アセスメント法"], exp: "ロールシャッハやTATが該当。嘘を書きにくい一方、解釈に高度な熟練が必要です。" }
-    ],
-    ch5: [
-        { q: "ジークムント・フロイトが19世紀末に創始した、無意識の領域や抑圧された感情を重視する心理療法の学派を何というか。", a: "精神分析", c: ["行動療法", "人間性心理学", "ゲシュタルト心理学"], exp: "ヒステリー治療の催眠から出発し、心の深層構造を明らかにした「精神分析」です。" },
-        { q: "精神分析療法において、頭に浮かんだことを善悪や論理で一切省くことなく、すべてありのままに話してもらう方法を何というか。", a: "自由連想法", c: ["内省法", "夢分析", "クライエント中心療法"], exp: "フロイトが確立した、無意識の抑圧を解放するための根幹技法です。" },
-        { q: "患者が過去の重要な人物（親など）に対して抱いていた感情を、目の前の治療者にそっくり向ける現象を何というか。", a: "転移", c: ["逆転移", "抵抗", "補償"], exp: "治療を進める上での極めて重要な鍵となります。逆に、治療者が患者に個人的感情を向けるのは「逆転移」です。" },
-        { q: "ロジャーズが創始した、治療者の「共感的理解」「無条件の肯定的な関心」「自己一致」を最重視する心理療法は何か。", a: "クライエント中心療法", c: ["精神分析療法", "認知行動療法", "ゲシュタルト療法"], exp: "来談者中心療法とも呼ばれ、患者自身が持つ自己実現の力を信頼して寄り添う心理療法です。" },
-        { q: "学習理論をベースにし、不適応な行動や恐怖症を、訓練や再学習によって消去・修正していく心理療法の総称は何か。", a: "行動療法", c: ["精神分析療法", "クライエント中心療法", "存在分析"], exp: "系統的脱感作法や、オペラント条件づけを応用したトークン・エコノミー法などが含まれます。" },
-        { q: "不適応な感情の背景には、物事の歪んだ受け止め方（自動思考）があると考え、その認知を修正していく心理療法を何というか。", a: "認知療法（ベック）", c: ["行動療法", "自由連想法", "遊戯療法"], exp: "アーロン・ベックがうつ病の治療のために開発したアプローチで、現在の「認知行動療法（CBT）」の中核です。" },
-        { q: "圧倒的なストレス環境に晒され続けた結果、「何をしても無駄だ」と努力を放棄し無気力になる現象は何か。", a: "学習性無力感", c: ["社会的手抜き", "防衛機制の崩壊", "同一性拡散"], exp: "セリグマンが犬の実験で発見。うつ病の心理的メカニズムを説明する重要な概念です。" },
-        { q: "異常事態に直面しているにもかかわらず、「これくらい日常の範囲内だ」と過小評価してしまう心理的バイアスを何というか。", a: "正常性バイアス", c: ["確証バイアス", "自己奉仕バイアス", "ハロー効果"], exp: "避難を遅らせる最大の原因となる危険な心理傾向で、臨床や災害心理学で重視されます。" },
-        { q: "アドラー心理学において、人間が自分の不完全さ（劣等感）を克服しようとし、それをバネにして行動のエネルギーに変える働きを何というか。", a: "補償", c: ["昇華", "転移", "自己奉仕"], exp: "劣等感を努力で克服したり、別の分野で頑張ることを「補償」と呼びます。" },
-        { q: "アドラー心理学において、自分の劣等感を直視して努力せず、「どうせ私なんか～だから」と言い訳の武器として誇示する状態を何というか。", a: "劣等コンプレックス", c: ["優越コンプレックス", "自己斉一性の喪失", "内向性不適応"], exp: "単なる劣等感（成長のバネになる）とは異なり、努力から逃げる言い訳にしてしまっている状態です。" }
-    ]
-};
-
+let database = {}; 
 let currentQuestions = [];
 let currentIndex = 0;
-let score = 0;
+let currentScore = 0;
+let activeChapter = "";
 
-function startQuiz(category) {
-    document.getElementById('menu').classList.add('hidden');
-    document.getElementById('quiz-container').classList.remove('hidden');
+// 予備のダミー（問題数が少ないシート用）
+const fallbackDummies = ["精神分析", "行動療法", "認知心理学", "ゲシュタルト心理学", "古典的条件づけ", "オペラント条件づけ", "アイデンティティ", "自己中心性", "基本的帰属の誤り", "ハロー効果", "防衛機制", "投影法"];
+
+document.getElementById('excel-file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
     
-    // 選択された章からランダムに最大20問抽出する
-    const all = [...quizData[category]];
-    currentQuestions = all.sort(() => Math.random() - 0.5).slice(0, 20);
+    document.getElementById('file-name').innerText = file.name + " を解析中...";
+    
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        try {
+            const data = new Uint8Array(evt.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            
+            database = {};
+            const chapterContainer = document.getElementById('chapter-buttons');
+            chapterContainer.innerHTML = "";
+            
+            // Excel内のすべてのシート（タブ）を順番に処理
+            workbook.SheetNames.forEach(sheetName => {
+                // シートを2次元配列（行・列）として読み込む（空白行もスルーするため）
+                const range = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1, defval: ""});
+                const validQuestions = [];
+                
+                let qIdx = -1, aIdx = -1, eIdx = -1;
+                
+                for (let i = 0; i < range.length; i++) {
+                    const row = range[i];
+                    if (!row || row.length === 0) continue;
+                    
+                    // まだ「問題文」「正解」の列が見つかっていない場合、列名を探す
+                    if (qIdx === -1 || aIdx === -1) {
+                        for (let j = 0; j < row.length; j++) {
+                            const cellVal = String(row[j]).trim();
+                            if (cellVal.includes('問題') || cellVal.toLowerCase() === 'q') qIdx = j;
+                            if (cellVal.includes('正解') || cellVal.includes('解答') || cellVal.includes('答') || cellVal.toLowerCase() === 'a') aIdx = j;
+                            if (cellVal.includes('解説') || cellVal.includes('説明') || cellVal.includes('解')) eIdx = j;
+                        }
+                    } else {
+                        // 列名が見つかった以降の行はデータとして抽出
+                        const qText = String(row[qIdx] || "").trim();
+                        const aText = String(row[aIdx] || "").trim();
+                        const expText = (eIdx !== -1 && row[eIdx]) ? String(row[eIdx]).trim() : "（解説はありません）";
+                        
+                        // タイトル行自体を問題として拾わないように除外条件を設定
+                        if (qText !== "" && aText !== "" && !qText.includes('問題文') && !aText.includes('正解')) {
+                            validQuestions.push({ q: qText, a: aText, exp: expText });
+                        }
+                    }
+                }
+                
+                // そのシートに有効な問題があればボタンを作成
+                if (validQuestions.length > 0) {
+                    database[sheetName] = validQuestions;
+                    const btn = document.createElement('button');
+                    btn.className = 'btn category-btn';
+                    btn.innerText = `📖 ${sheetName} (全${validQuestions.length}問)`;
+                    btn.onclick = () => startQuiz(sheetName);
+                    chapterContainer.appendChild(btn);
+                }
+            });
+            
+            // ボタンが1つも作られなかった場合のエラー処理
+            if (Object.keys(database).length === 0) {
+                alert("データを正しく読み込めませんでした。Excel内のシートに「問題文」「正解」という項目名があるか確認してください。");
+                document.getElementById('file-name').innerText = "エラー：問題が見つかりません";
+                return;
+            }
+            
+            // 画面を切り替えてボタンを表示
+            document.getElementById('upload-screen').classList.add('hidden');
+            document.getElementById('menu-screen').classList.remove('hidden');
+            
+        } catch (error) {
+            alert("Excelファイルの解析中にエラーが発生しました。");
+            console.error(error);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+});
+
+function startQuiz(chapterName) {
+    activeChapter = chapterName;
+    document.getElementById('menu-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    
+    const allQuestions = database[chapterName];
+    // ランダムにシャッフルして最大20問抽出
+    let shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
+    currentQuestions = shuffled.slice(0, 20);
     
     currentIndex = 0;
-    score = 0;
+    currentScore = 0;
     showQuestion();
 }
 
 function showQuestion() {
-    const q = currentQuestions[currentIndex];
+    const qInfo = currentQuestions[currentIndex];
+    const allQuestionsInChapter = database[activeChapter];
     
-    // 【修正箇所1】ここでHTMLの構造を壊さないように、直接テキストだけを書き換える
-    document.getElementById('stats').innerHTML = `問題 ${currentIndex + 1} / ${currentQuestions.length}`;
-    
-    document.getElementById('question').innerText = q.q;
+    document.getElementById('q-num').innerText = currentIndex + 1;
+    document.getElementById('q-total').innerText = currentQuestions.length;
+    document.getElementById('question').innerText = qInfo.q;
     document.getElementById('feedback-area').style.display = "none";
     
     const choicesDiv = document.getElementById('choices');
     choicesDiv.innerHTML = "";
     
-    // 正解とダミーをシャッフルして4択を生成
-    const allChoices = [q.a, ...q.c].sort(() => Math.random() - 0.5);
+    // 他の正解からダミーを3つ引っ張ってくるAI機能
+    let dummySet = new Set();
+    let attempts = 0;
+    while(dummySet.size < 3 && attempts < 200) {
+        let randomRow = allQuestionsInChapter[Math.floor(Math.random() * allQuestionsInChapter.length)];
+        let randomAns = randomRow.a;
+        if(randomAns && randomAns !== qInfo.a) {
+            dummySet.add(randomAns);
+        }
+        attempts++;
+    }
+    
+    // 万が一ダミーが足りない場合は予備から追加
+    let dummyArray = Array.from(dummySet);
+    while(dummyArray.length < 3) {
+        let fallback = fallbackDummies[Math.floor(Math.random() * fallbackDummies.length)];
+        if(fallback !== qInfo.a && !dummyArray.includes(fallback)) dummyArray.push(fallback);
+    }
+    
+    // 正解とダミーを混ぜてシャッフル
+    const allChoices = [qInfo.a, ...dummyArray].sort(() => Math.random() - 0.5);
+    
     allChoices.forEach(choice => {
         const btn = document.createElement('button');
         btn.className = 'btn choice-btn';
         btn.innerText = choice;
-        btn.onclick = () => checkAnswer(btn, choice, q.a, q.exp);
+        btn.onclick = () => checkAnswer(btn, choice, qInfo.a, qInfo.exp);
         choicesDiv.appendChild(btn);
     });
 }
@@ -211,18 +227,18 @@ function checkAnswer(btn, selected, correct, exp) {
     
     if (selected === correct) {
         btn.classList.add('correct');
-        resDiv.innerText = "⭕ 正解！";
+        resDiv.innerText = "⭕ 大正解！";
         resDiv.style.color = "#2ecc71";
-        score++;
+        currentScore++;
     } else {
         btn.classList.add('wrong');
-        resDiv.innerText = "❌ 不正解...";
+        resDiv.innerText = "❌ 惜しい！";
         resDiv.style.color = "#e74c3c";
-        // 正解の選択肢をハイライト
+        // 本当の正解を緑色にする
         btns.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
     }
     
-    expDiv.innerText = exp;
+    expDiv.innerHTML = `<strong>正解のキーワード：${correct}</strong><br><br>${exp}`;
     document.getElementById('feedback-area').style.display = "block";
 }
 
@@ -236,22 +252,26 @@ function nextQuestion() {
 }
 
 function showResult() {
-    document.getElementById('quiz-container').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
     
     const total = currentQuestions.length;
-    
-    // 【修正箇所2】安全にスコア表示部分のテキストを書き換える
-    document.getElementById('score').innerText = score;
+    document.getElementById('score').innerText = currentScore;
     document.getElementById('total-score').innerText = total;
     
     let comment = "";
-    const rate = score / total;
-    if (rate === 1) comment = "完璧です！検定1級・特1級も狙える知識量です！🏆";
-    else if (rate >= 0.8) comment = "素晴らしい！2級合格圏内に完全に達しています！✨";
-    else if (rate >= 0.6) comment = "合格ライン線上です！解説の用語をもう一度確認しましょう。";
-    else comment = "伸び代がたくさんあります！一問一答のデータベースを繰り返し解いてみましょう。";
+    const rate = currentScore / total;
+    if (rate === 1) comment = "完璧！全問正解です！この章の知識は本番もバッチリですね！🏆";
+    else if (rate >= 0.8) comment = "素晴らしい！心理学検定2級の合格ラインを余裕で超えています！✨";
+    else if (rate >= 0.6) comment = "合格圏内です！間違えた問題の解説をよく読み直してみましょう。";
+    else comment = "もう一度この章にチャレンジして、基礎を固めましょう！📖";
+    
     document.getElementById('comment').innerText = comment;
+}
+
+function backToMenu() {
+    document.getElementById('result-screen').classList.add('hidden');
+    document.getElementById('menu-screen').classList.remove('hidden');
 }
 </script>
 </body>
